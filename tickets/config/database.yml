@@ -12,10 +12,10 @@ development:
   adapter: mysql2
   encoding: utf8
   reconnect: false
-  database: tickets_development
+  database: tickets
   pool: 5
-  username: root
-  password:
+  username: ticket_admin
+  password: "secret_ticket_password"
   socket: /var/run/mysqld/mysqld.sock
 
 # Warning: The database defined as "test" will be erased and

@@ -1,0 +1,53 @@
+html 
+{
+	margin:0;
+	padding:0;
+	width:100%;	
+}
+body 
+{
+	margin:0;
+	padding:20px 0 0 0;
+	width:100%;
+	background:#000;
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 20px;
+    background-color: #E0EEE0;
+}
+.block
+{
+    width: 300px;    
+    border: 1px solid #000;
+    padding: 20px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;        
+	position:relative;	
+	left:50%;
+	margin-left:-150px;    
+}
+.start
+{    
+    text-align: center;
+}
+        .start .userplace input
+        {        
+            width: 200px;        
+        }     
+.error
+{
+    color: #9F0006;
+    font-size: 1.5em;
+    text-align: center;    
+}
+.success
+{
+    color: #0045BF;
+    font-size: 1.5em;
+    text-align: center;    
+}
+    .error a, .success a
+    {
+        display: block;
+        font-size: 0.5em;
+    }

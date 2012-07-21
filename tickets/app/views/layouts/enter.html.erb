@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= @title || 'Билеты' %></title>
+  <%= stylesheet_link_tag "bootstrap_and_overrides.css.less" %>
+  <%= stylesheet_link_tag "enter/application", :media => "all" %>
+
+  <%= javascript_include_tag "frameworks/jquery.min.js" %>
+   <!--<%= javascript_include_tag "frameworks/json2.js" %>!-->
+  <%= javascript_include_tag "frameworks/underscore-min.js" %>
+  <%= javascript_include_tag "frameworks/backbone.js" %>
+  <%= javascript_include_tag "enter/application" %>
+
+
+  <%= csrf_meta_tags %>
+  <%= favicon_link_tag 'train-icon.ico' %>
+
+</head>
+<body>
+
+<%= yield %>
+
+</body>
+</html>

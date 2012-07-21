@@ -1,0 +1,55 @@
+<div id="header">
+    <ul id="top_links">
+    	<div id="hits">
+	        <li><a href="/about.php">О нас</a></li>
+	        <li><a href="/faq.php">Вопросы и Ответы</a></li>
+	        <li><a href="/news.php">Новости</a></li>
+	     </div>
+
+        <li>Здравствуйте,  <%= link_to(session[:current_user].first_name , {:action => 'logout'})%></li>
+        <li><%= link_to("Выход", {:action => 'logout'})%></li>
+    </ul>       
+</div>
+
+<div id="content">
+	<div id="search_panel">
+		<ul>
+			<li id="search" class="tab active">
+				<a href="#!/search" data-toggle="tab" data-content="search">Поиск</a>
+			</li>
+			<li id="templates" class="tab">
+				<a href="#!/templates" data-toggle="tab" data-content="signup">Шаблоны</a>
+			</li>
+			<li id="orders" class="tab">
+				<a href="#!/orders" data-toggle="tab" data-content="signup">Заказы</a>
+			</li>
+			<li id="history" class="tab">
+				<a href="#!/history" data-toggle="tab" data-content="signup">История</a>
+			</li>
+		</ul>
+
+		<div class="block_container">
+			Контейнер для block
+			      <div id="main_block">
+      			  </div>
+		</div>
+	</div>
+
+</div>
+
+        
+<script type="text/template" id="search_block">
+	<h3>Шаблон поиска</h3>
+</script>
+
+<script type="text/template" id="template_block">
+	<h3>Вкладка Шаблонов</h3>
+</script>
+
+<script type="text/template" id="order_block">
+	<h3>шаблон заказов</h3>
+</script>
+
+<script type="text/template" id="history_block">
+	<h3>шаблон истории</h3>
+</script>

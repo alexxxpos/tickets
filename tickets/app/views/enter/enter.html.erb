@@ -1,0 +1,116 @@
+<script type="text/template" id="login">
+<form id="login-form" class="form-horizontal">
+  <fieldset>
+    <div id="email_group" class="control-group">
+      <label class="control-label" for="email">Email</label>
+      <div class="controls">
+        <input id="login_email" name="login_email" type="email" value="alexxxpos@gmail.com" required="required" />
+      </div>
+    </div>
+    <div id="password_group" class="control-group">
+      <label class="control-label" for="password">Пароль</label>
+      <div class="controls">
+        <input id="login_password" name="login_password" value="123Afdd" type="password" required="required" />
+      </div>
+      <div class="mistake login">Тут будет ошибка</div>
+    </div>
+    <div class="form-actions">
+      <input type="button" id="do_login" value="Войти" class="btn btn-primary" />
+    </div>
+  </fieldset>
+</form>
+</script>
+
+<script type="text/template" id="signup">
+<form id="signup-form" class="form-horizontal">
+  <fieldset>
+    <div id="email_group" class="control-group">
+      <label class="control-label" for="login_user_email">Имя</label>
+      <div class="controls">
+        <input id="reg_first_name" name="reg_first_name" value="Иван" type="text" required="required" />
+      </div>
+    </div>
+
+    <div id="email_group" class="control-group">
+      <label class="control-label" for="login_user_email">Фамилия</label>
+      <div class="controls">
+        <input id="reg_last_name" name="reg_last_name" value="Иванов" type="text" required="required" />
+      </div>
+    </div>
+
+    <div id="email_group" class="control-group">
+      <label class="control-label" for="login_user_email">Email</label>
+      <div class="controls">
+        <input id="reg_email" name="reg_email" value="alexxxpos@gmail.com" type="email" required="required" />
+      </div>
+    </div>
+    <div id="password_group" class="control-group">
+      <label class="control-label" for="login_user_password">Пароль</label>
+      <div class="controls">
+        <input id="reg_password" name="reg_password" value="123Afdd" type="password" required="required" />
+      </div>
+    </div>
+    <div id="password_confirmation_group" class="control-group">
+      <label class="control-label" for="login_user_password_confirmation">Подтверждение</label>
+      <div class="controls">
+        <input id="reg_password_confirmation" name="reg_password_confirmation" value="123Afdd"  type="password" required="required" />
+      </div>
+      <div class="mistake reg">Тут будет ошибка</div>
+    </div>
+
+    <div class="form-actions">
+      <input type="button" id="do_registration" value="Зарегистрироваться" class="btn btn-primary" />
+    </div>
+  </fieldset>
+</form>
+</script>
+
+<script type="text/template" id="retrieve_password">
+<form id="retrieve-password-form" class="form-horizontal">
+  <fieldset>
+    <div id="email_group" class="control-group">
+      <label class="control-label" for="email">Ваш Email</label>
+      <div class="controls">
+        <input id="email" name="email" type="email" required="required" />
+      </div>
+    </div>
+    <div class="form-actions">
+      <input type="button" value="Отправить инструкции по сбросу пароля" class="btn btn-primary" />
+    </div>
+  </fieldset>
+</form>
+</script>
+
+<script type="text/template" id="finish_registration">
+<form id="retrieve-password-form" class="form-horizontal">
+  <fieldset>
+  <h3>Спасибо за регистрацию</h3>
+  <br />
+  <div>На Ваш Email было выслано письмо с подробными инструкциями для активации аккаунта.</div>
+  </fieldset>
+</form>
+</script>
+
+
+
+
+<div class="container" id="main"><div><div class="span6 offset3">
+  <%= image_tag('logo.png', :class => "logo") %>
+  <h2>Покупка билетов</h2>
+  <em>У нас вы можете заказать ж/д билеты не отходя от компьютера</em>
+ 
+  
+  <div id="unauthenticated-view-container">
+    <ul class="nav nav-tabs">
+      <li id="_login_" class="active"><a href="#!/" data-toggle="tab" data-content="login">Вход</a></li>
+      <li id="_signup_" class=""><a href="#!/signup" data-toggle="tab" data-content="signup">Регистрация</a></li>
+      <li id="_retrieve_password_" class=""><a href="#!/retrieve_password" data-toggle="tab" data-content="retrievePassword">Забыли пароль?</a></li>
+    </ul>
+    <div class="tab-content" id="tab-content">
+      <div id="enter_block">
+
+      </div>
+  </div>
+  </div>
+</div>
+</div></div>
