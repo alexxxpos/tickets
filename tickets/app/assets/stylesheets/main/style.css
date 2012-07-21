@@ -25,9 +25,11 @@ div#hits{
 	border-radius: 0 0 7px 7px ;
 	border-radius: 0 0 7px 7px ;
 	float: left;
+	font: 18px Arial, Helvetica, sans-serif;
 }
+
 div#hits a{
-	color:#636363;
+
 }
 
 ul{

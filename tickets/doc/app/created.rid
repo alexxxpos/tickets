@@ -1,0 +1,10 @@
+Sat, 21 Jul 2012 13:09:06 +0300
+doc/README_FOR_APP	Sat, 14 Jul 2012 11:35:38 +0300
+app/models/user.rb	Wed, 18 Jul 2012 23:57:03 +0300
+app/controllers/enter_controller.rb	Thu, 19 Jul 2012 20:09:49 +0300
+app/controllers/main_controller.rb	Thu, 19 Jul 2012 20:10:10 +0300
+app/controllers/application_controller.rb	Sat, 14 Jul 2012 11:35:38 +0300
+app/helpers/enter_helper.rb	Thu, 19 Jul 2012 11:36:44 +0300
+app/helpers/main_helper.rb	Sat, 14 Jul 2012 12:30:09 +0300
+app/helpers/application_helper.rb	Sat, 14 Jul 2012 11:35:38 +0300
+app/mailers/user_mailer.rb	Thu, 19 Jul 2012 00:21:40 +0300
