@@ -18,6 +18,7 @@ div#header{
 	float: left;
 	margin-left: 10px;
 	margin-bottom: 50px;
+	width: 65%;
 }
 
 div#hits{
@@ -26,6 +27,10 @@ div#hits{
 	border-radius: 0 0 7px 7px ;
 	float: left;
 	font: 18px Arial, Helvetica, sans-serif;
+}
+
+div#user_panel{
+	float: right;
 }
 
 div#hits a{
@@ -66,7 +71,6 @@ div#content {
 	clear: both;
 	width: 90%;
 	margin: 0px auto;
-	padding-top: 10px;
 	max-width: 1400px;
 	min-width: 1000px;
 	

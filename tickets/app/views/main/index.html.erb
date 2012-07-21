@@ -1,18 +1,19 @@
-<div>
-<div id="header">
-    <ul id="top_links">
-    	<div id="hits">
-	        <li><a href="/about.php">О нас</a></li>
-	        <li><a href="/faq.php">Вопросы и Ответы</a></li>
-	        <li><a href="/news.php">Новости</a></li>
-	     </div>
-
-        <li>Здравствуйте,  <%= link_to(session[:current_user].first_name , {:action => 'logout'})%></li>
-        <li><%= link_to("Выход", {:action => 'logout'})%></li>
-    </ul>       
-</div>
-
 <div id="content">
+	<div id="header">
+	    <ul id="top_links">
+	    	<div id="hits">
+		        <li><a href="/about.php">О нас</a></li>
+		        <li><a href="/faq.php">Вопросы и Ответы</a></li>
+		        <li><a href="/news.php">Новости</a></li>
+		     </div>
+		    <div id="user_panel">
+		        <li>Здравствуйте,  <%= link_to(session[:current_user].first_name , {:action => 'logout'})%></li>
+		        <li><%= link_to("Выход", {:action => 'logout'})%></li>
+		    </div>
+		 </ul> 	          
+	</div>
+
+
 	<div id="search_panel">
 		<ul>
 			<li id="search" class="tab active">
@@ -30,7 +31,7 @@
 		</ul>
 
 		<div class="block_container">
-			Контейнер для block
+			Контейнер для block 
 			      <div id="main_block">
       			  </div>
 		</div>
@@ -40,7 +41,7 @@
 <div>
         
 <script type="text/template" id="search_block">
-	<h3>Шаблон поиска</h3>
+	<h3>Поисковый шаблон!!</h3>
 </script>
 
 <script type="text/template" id="template_block">
