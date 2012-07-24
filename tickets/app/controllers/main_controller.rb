@@ -23,7 +23,7 @@ class MainController < ApplicationController
   end
 
   def search
-    
+
     if check_session()
       if params[:type]
         require 'net/http'                 
@@ -33,7 +33,8 @@ class MainController < ApplicationController
         http = Net::HTTP.new(host)          # Create a connection
         headers, body = http.get(path)      # Request the file
         if headers.code == "200"            # Check the status code   
-          render :json => {:success => true, :text => headers.body} and return                    
+          render :json => {:success => true, :text => headers.body} and return  
+          #render(:text =>headers.body)                 
         else                                
           render :json => {:success => false, :text => "Server is not found"} and return
         end
