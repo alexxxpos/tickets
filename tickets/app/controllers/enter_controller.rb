@@ -24,7 +24,7 @@ class EnterController < ApplicationController
   	salt= Digest::SHA1.hexdigest(params[:email]+(Time.now).to_s)
   	encrypted_password= Digest::SHA1.hexdigest(params[:password]+salt)
   	
-  	@user=User.new(:first_name => params[:first_name], :last_name => params[:last_name], :password => encrypted_password, :salt =>salt,:activated => '0', :email =>params[:email], :role => 'user')
+  	@user=User.new(:first_name => params[:first_name], :last_name => params[:last_name], :password => encrypted_password, :salt =>salt,:activated => false, :email =>params[:email], :role => 'user')
   	
   	if @user.save
   			UserMailer.welcome_email(@user).deliver

@@ -11,18 +11,27 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120718180820) do
+ActiveRecord::Schema.define(:version => 20120725190625) do
+
+  create_table "histories", :force => true do |t|
+    t.integer  "user_id"
+    t.string   "title",      :limit => 350
+    t.datetime "data"
+    t.text     "json"
+    t.datetime "created_at",                :null => false
+    t.datetime "updated_at",                :null => false
+  end
 
   create_table "users", :force => true do |t|
     t.string   "first_name", :limit => 25
     t.string   "last_name",  :limit => 50
     t.string   "password",   :limit => 250
     t.string   "salt",       :limit => 250
-    t.decimal  "activated",                 :precision => 10, :scale => 0
+    t.boolean  "activated"
     t.string   "role",       :limit => 25
-    t.string   "email",      :limit => 50,                                 :default => ""
-    t.datetime "created_at",                                                               :null => false
-    t.datetime "updated_at",                                                               :null => false
+    t.string   "email",      :limit => 50,  :default => ""
+    t.datetime "created_at",                                :null => false
+    t.datetime "updated_at",                                :null => false
   end
 
 end
