@@ -1,0 +1,140 @@
+<div id="content">
+	<div id="header">
+	    <ul id="top_links">
+	    	<div id="hits">
+		        <li><a href="main">Главная</a></li>
+		        <li><a href="#">Вопросы и Ответы</a></li>
+		        <li><a href="#">О нас</a></li>
+		     </div>
+		    <div id="user_panel">
+		        <li>Здравствуйте,  <%= link_to(session[:current_user].first_name , {:controller => 'cabinet',:action => 'index'})%></li>
+		        <li><%= link_to("Выход", {:action => 'logout'})%></li>
+		    </div>
+		 </ul> 	          
+	</div>
+	<div id="search_panel">
+		<ul>
+			<li id="search" class="tab active">
+				<a href="#!/info" data-toggle="tab" data-content="search">Мой профиль</a>
+			</li>
+
+		</ul>
+
+		<div class="block_container">
+			<br />
+			      <div id="main_block">
+      			</div>
+		</div>
+	</div>
+
+</div>
+
+
+<script type="text/template" id="info">
+
+<form id="signup-form" class="form-horizontal">
+  <fieldset>
+    <div id="email_group" class="control-group">
+      <label class="control-label" for="login_user_email">Имя</label>
+      <div class="controls">
+      	<span class="user_info_field"><%= session[:current_user].first_name %></span>
+      </div>
+    </div>
+
+    <div id="email_group" class="control-group">
+      <label class="control-label" for="login_user_email">Фамилия</label>
+      <div class="controls">
+        <span class="user_info_field"><%= session[:current_user].last_name %></span>
+      </div>
+    </div>
+
+    <div id="email_group" class="control-group">
+      <label class="control-label" for="login_user_email">Email</label>
+      <div class="controls">
+        <span class="user_info_field"><%= session[:current_user].email %></span>
+      </div>
+    </div>
+    <div id="password_group" class="control-group">
+      <label class="control-label" for="login_user_password">Роль</label>
+      <div class="controls">
+        <span class="user_info_field">Пользователь</span>
+      </div>
+    </div>
+    <div id="password_confirmation_group" class="control-group">
+      <label class="control-label" for="login_user_password_confirmation">Зарегистрирован:</label>
+      <div class="controls">
+        <span class="user_info_field"><%= session[:current_user].created_at.strftime("%d.%m.%Y  / %H:%M") %></span>
+      </div>
+    </div>
+    <div id="password_confirmation_group" class="control-group">
+      <label class="control-label" for="login_user_password_confirmation">Изменен:</label>
+      <div class="controls">
+        <span class="user_info_field"><%= session[:current_user].updated_at.strftime("%d.%m.%Y  / %H:%M") %></span>
+      </div>
+    </div>
+
+    <div class="edit_result"><%= flash[:notice]%></div>
+    <div class="form-actions">
+     	<input type="button" id="do_edit_info" class="user_cabinet_buttons" value="Редактировать" />
+    </div>
+  </fieldset>
+</form>
+</script>
+
+<script type="text/template" id="edit_info">
+<form id="edit_info_form" class="form-horizontal">
+  <fieldset>
+
+    <div id="email_group" class="control-group">
+      <label class="control-label" for="login_user_email">Имя</label>
+      <div class="controls">
+        <input id="edit_first_name" name="edit_first_name" value="<%= session[:current_user].first_name %>" type="text" required="required" />
+      </div>
+    </div>
+
+    <div id="email_group" class="control-group">
+      <label class="control-label" for="login_user_email">Фамилия</label>
+      <div class="controls">
+        <input id="edit_last_name" name="edit_last_name" value="<%= session[:current_user].last_name %>" type="text" required="required" />
+      </div>
+    </div>
+
+    <div id="email_group" class="control-group">
+      <label class="control-label" for="login_user_email">Email</label>
+      <div class="controls">
+        <input id="edit_email" name="edit_email" value="<%= session[:current_user].email %>" type="email" readonly="readonly" disabled="disabled" required="required" />
+      </div>
+    </div>
+
+    <div id="password_group" class="control-group">
+      <label class="control-label" for="login_user_password">Старый пароль</label>
+      <div class="controls">
+        <input id="edit_old_password" name="edit_old_password" value="123Afdd" type="password" required="required" />
+      </div>
+    </div>
+
+    <div id="password_group" class="control-group">
+      <label class="control-label" for="login_user_password">Новый пароль</label>
+      <div class="controls">
+        <input id="edit_new_password" name="edit_new_password" value="123Afdd" type="password" required="required" />
+      </div>
+    </div>
+
+    <div id="password_confirmation_group" class="control-group">
+      <label class="control-label" for="login_user_password_confirmation">Подтверждение</label>
+      <div class="controls">
+        <input id="edit_password_confirmation" name="edit_password_confirmation" value="123Afdd"  type="password" required="required" />
+      </div>
+    </div>
+      <div class="mistake reg">* Тут будет ошибка</div>
+
+    <div id="edit_info_form_actions" class="form-actions">
+      <input type="button" id="cancel_edit_info" class="user_cabinet_buttons" value="Отмена" />
+      <input type="button" id="save_edit_info" class="user_cabinet_buttons" value="Сохранить" />
+    </div>
+  </fieldset>
+</form>
+
+
+</script>
+

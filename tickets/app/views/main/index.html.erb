@@ -1,14 +1,13 @@
-
 <div id="content">
-	<div id="header">
+	<div id="header_tickets">
 	    <ul id="top_links">
 	    	<div id="hits">
-		        <li><a href="/about.php">О нас</a></li>
-		        <li><a href="/faq.php">Вопросы и Ответы</a></li>
-		        <li><a href="/news.php">Новости</a></li>
+		        <li><a href="#">О нас</a></li>
+		        <li><a href="#">Вопросы и Ответы</a></li>
+		        <li><a href="cabinet">Кабинет</a></li>
 		     </div>
 		    <div id="user_panel">
-		        <li>Здравствуйте,  <%= link_to(session[:current_user].first_name , {:action => 'logout'})%></li>
+		        <li>Здравствуйте,  <%= link_to(session[:current_user].first_name , {:controller => 'cabinet',:action => 'index'})%></li>
 		        <li><%= link_to("Выход", {:action => 'logout'})%></li>
 		    </div>
 		 </ul> 	          
@@ -20,9 +19,7 @@
 			<li id="search" class="tab active">
 				<a href="#!/search" data-toggle="tab" data-content="search">Поиск</a>
 			</li>
-			<li id="templates" class="tab">
-				<a href="#!/templates" data-toggle="tab" data-content="signup">Шаблоны</a>
-			</li>
+
 			<li id="orders" class="tab">
 				<a href="#!/orders" data-toggle="tab" data-content="signup">Заказы</a>
 			</li>
@@ -32,9 +29,19 @@
 		</ul>
 
 		<div class="block_container">
-			Контейнер для block 
-			      <div id="main_block">
+
+			      <div id="search_box">
+                        
       			  </div>
+
+                    <div id="history_box">
+                        
+                    </div>
+
+                    <div id="orders_box">
+                        
+                    </div>
+
 		</div>
 	</div>
 
@@ -46,9 +53,6 @@
 	<div id="app"></div>
 </script>
 
-<script type="text/template" id="template_block">
-	<h3>Вкладка Шаблонов</h3>
-</script>
 
 <script type="text/template" id="order_block">
 	<h3>шаблон заказов</h3>
@@ -60,12 +64,12 @@
 
 <!-- Test templates !-->
 
-<script type="text/template" id="StationView">
-                <input class="input" type="text" ) />
+        <script type="text/template" id="StationView">
+                <input class="input" type="text" value="{{title}}" />
                 <button class="del">X</button>
         </script>
         <script type="text/template" id="DateView">
-                <input class="input" type="text"  />
+                <input class="input" type="text" value="{{date}}" />
                 <button class="del">X</button>    
         </script>
         <script type="text/template" id="StationsView">
@@ -77,6 +81,7 @@
                 <span></span>
         </script>
         <script type="text/template" id="TripView">
+                <div class="parametrsView"></div>
                 <div class="stationsFromView"></div>
                 <div class="stationsToView"></div>
                 <div class="datesView"></div>
@@ -92,8 +97,42 @@
                 <div class="TravelView"></div>
                 <button class="search">Поиск мест</button>
                 <button class="console">Консоль</button>
+                <hr>
                 <div class="Result"></div>
         </script>
         <script type="text/template" id="Progress">
                 <div class="progressBar"></div>
+        </script>
+        <script type="text/template" id="ParametrsView">
+                <span>
+                        <span>Мест:<input class="changing" id="number" type="text" size="3"/></span>
+                        <span id="buttonset">
+                        <input class="changing" type="checkbox" id="l" >Л</input>
+                        <input class="changing" type="checkbox" id="k" >К</input>
+                        <input class="changing" type="checkbox" id="p" />П</input>
+                        <input class="changing" type="checkbox" id="s1" />С1</input>
+                        <input class="changing" type="checkbox" id="s2" />С2</input>
+                        </span>
+                        <input class="changing" type="checkbox" id="down" />Только нижние</input>
+                        <input class="changing" type="checkbox" id="one" />В одном купе</input>
+                        <input class="changing" type="checkbox" id="side" />Не боковые</input>
+                        Время от <input class="changing" type="text" id="from" size="3"/> 
+                        до <input class="changing" type="text" id="till" size="3"/>
+                </span>
+        </script>
+        <script type="text/template" id="TravelResultView">
+                <div></div>
+        </script>
+        <script type="text/template" id="SimpleTripsResultView">
+                <div></div>
+                <hr>
+        </script>
+        <script type="text/template" id="SimpleTripResultView">
+                <div class="caption">
+                    <button class="toggle">{{date_start}} {{station_from}} {{station_till}} {{goodPlaces}} мест</button>
+                </div>
+                <div class="accordion"></div>
+        </script>
+        <script type="text/template" id="TrainHeader">
+                <a href="#">{{num}}</a>
         </script>

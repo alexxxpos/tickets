@@ -12,7 +12,7 @@ class MainController < ApplicationController
 
   def index
     if check_session()
-	  	@title = "Кабинет"
+	  	@title = "Функционал"
 	  	render(:template =>'main/index')
     end
   end
@@ -31,18 +31,25 @@ class MainController < ApplicationController
        data= Array.new
 
         request.POST.each_with_index {|item, index| data[data.length]= item[0]+'='+item[1]}
-         post_string= data.join('&')
+        post_string= data.join('&')
 
         require 'socket'
-         
+        count=0
+        post_string.each_byte do |byte| 
+          count+= 1
+        end  
+
         host = 'booking.uz.gov.ua'     # The web serve
+        #host= 'mock.my'
         port = 80                           # Default HTTP port
         path = '/ru/purchase/'+params[:type]    # The file we want 
+        #path = '/proxy.php'
         #equest = "POST #{path} HTTP/1.1\r\n"+"Host: #{host} \r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
         request="POST #{path} HTTP/1.1\r\n"
         request+="Host: #{host} \r\n"
         request+="Content-Type: application/x-www-form-urlencoded\r\n"
-        request+="Content-Length: "+post_string.length.to_s+"\r\n"
+        #request+="Content-Length: "+post_string.size.to_s+"\r\n"
+        request+="Content-Length: "+count.to_s+"\r\n"
         request+="Connection: close\r\n\r\n"
         request+=post_string
         socket = TCPSocket.open(host,port)  # Connect to server
@@ -50,6 +57,7 @@ class MainController < ApplicationController
         response = socket.read              # Read complete response
         # Split response at first blank line into headers and body
         headers,body = response.split("\r\n\r\n", 2) 
+        #render(text => body)
         render :json => body and return                          # And display it
 
       else
@@ -64,7 +72,7 @@ class MainController < ApplicationController
 
   def view_history
     if check_session()
-      history=History.select('title,json,created_at').where(:user_id => session[:current_user]).limit(100)
+      history=History.select('id, title, json,created_at').where(:user_id => session[:current_user]).limit(100).order("created_at")
       render :json => history
     end
   end

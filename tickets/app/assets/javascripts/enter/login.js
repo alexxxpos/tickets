@@ -75,6 +75,17 @@ $(function () {
             //If everything ok -> send 'true'
             return 1;
             
+        },
+
+        checkEmail: function(rp_email){
+            if(rp_email==""){
+                $('#rp_email').focus();
+                $(".mistake").text("* Вы не указали email").css("display","block");
+                return 0;
+            }
+            var rpt_email=/\b[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b/i;
+            if(!rpt_email.test(rp_email)) { $('#login_email').focus(); $(".mistake").text("* Неверный формат Email").css("display","block"); return 0;}
+            return 1;
         }
 
     });
@@ -123,8 +134,9 @@ $(function () {
         },
 
         events: {
-            "click #do_registration": "registration", // handler on click button to registrate 
-            "click #do_login": "login",               // handler on click button to login
+            "click #do_registration": "registration",           // handler on click button to registrate 
+            "click #do_login": "login",                         // handler on click button to login
+            "click #do_retrieve_password": "retrieve_password", // handler on click button to retrieve_password
             }, 
 
 
@@ -157,6 +169,8 @@ $(function () {
                             }else{
                                 if (data.text=="email_error") {
                                     $(".mistake").text("* Пользователя с таким email не существует!").css("display","block");
+                                }else if(data.text=="not_activated"){
+                                    $(".mistake").html("* Ваш аккаунту неактивен. <br />Инструкции по активации были высланы Вам при регистрации на Email").css("display","block");
                                 }else{
                                     $(".mistake").text("* Ошибка ввода пароля!").css("display","block");
                                 }    
@@ -196,6 +210,7 @@ $(function () {
                
                             if (data.success==true) {
                                 appState.set({ state: "finish_registration" });
+                                $("#link_to_activate").html("<a href='enter/activate?user="+data.salt+"'>Активировать</a>");
                             }else{
                                 if (data.text=="email already exist") {
                                     $(".mistake").text("* Пользователь с таким email уже существует!").css("display","block");
@@ -205,6 +220,36 @@ $(function () {
                             }
                         }
                     }
+
+
+        },
+
+        retrieve_password: function(){
+            $('.mistake').css("display","none");
+            var check = User.checkEmail($('#rp_email').val());
+            if(check){
+                $.post(
+                        "enter/retrieve_password",
+                        {
+                            email:$('#rp_email').val()
+                        },
+                        onAjaxSuccess
+                        );
+ 
+                        function onAjaxSuccess(data)
+                        {
+                           if (data.success==true) {
+                                $(".mistake").text("На Ваш Email отправлено письмо с инструкциями по смене пароля").css({"display":"block","color":"blue"});
+                           }else{
+                                    $(".mistake").text("* Пользователя с таким email не существует!").css({"display":"block", "color":"red"});
+
+
+
+                           }
+                        }
+            }
+
+
 
 
         },

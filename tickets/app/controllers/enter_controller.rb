@@ -31,7 +31,7 @@ class EnterController < ApplicationController
   			#format.html { redirect_to(@user, :notice => 'User was successfully created.') }
         #format.json { render :json => @user, :status => :created, :location => @user }
 
-			render :json => {:success => true, :text => "success"} and return
+			render :json => {:success => true, :text => "success", :salt=> salt} and return
 
 		else
 			render :json => {:success => false, :text => "db error"} and return
@@ -57,17 +57,43 @@ class EnterController < ApplicationController
 
     user=user.fetch(0)
     encrypted_password= Digest::SHA1.hexdigest(params[:password]+user.salt)
-    if user.password==encrypted_password
+    if user.password==encrypted_password && user.activated==true
         session[:current_user] = user
         render :json => {:success => true, :text => "success"} and return
 
-    else 
+    elsif user.password==encrypted_password && user.activated==false
+        render :json => {:success => false, :text => "not_activated"} and return
+    else
         render :json => {:success => false, :text => "password_error"} and return
     end  
 
   end
 
+  def activate
+    if !params[:user] || params[:user]==""
+      render('public/404.html') and return
+    end
+    user=User.where(:salt =>params[:user])
+    if user.count>0 && user.fetch(0).activated==false
+      user.fetch(0).update_attributes(:activated => true)
+      render(:text =>'Спасибо. Ваш аккаунт был успешно активирован!<br />Теперь вы можете зайти на наш сайт. <br /><a href="/">Перейти на страницу входа</a>') and return
+    else
+      render('public/404.html') and return
+    end
 
+  end
 
+  def retrieve_password
+      if params[:email]
+          user=User.where(:email => params[:email])
+          if user.count<1
+            render :json => {:success => false, :text => "email_error"} and return
+          else
+            render :json => {:success => true, :text => "success"} and return
+          end
+      else
+          render :json => {:success => false, :text => "no_data"} and return
+      end
+  end
 
 end

@@ -59,7 +59,7 @@
     </div>
 
     <div class="form-actions">
-      <input type="button" id="do_registration" value="Зарегистрироваться" class="btn btn-primary" />
+      <input type="reset" id="do_registration" value="Зарегистрироваться" class="btn btn-primary" />
     </div>
   </fieldset>
 </form>
@@ -71,11 +71,12 @@
     <div id="email_group" class="control-group">
       <label class="control-label" for="email">Ваш Email</label>
       <div class="controls">
-        <input id="email" name="email" type="email" required="required" />
+        <input id="rp_email" name="rp_email" value="alexxxpos@gmail.com" type="email" required="required" />
       </div>
+        <div class="mistake retrieve_password">Тут будет ошибка</div>
     </div>
     <div class="form-actions">
-      <input type="button" value="Отправить инструкции по сбросу пароля" class="btn btn-primary" />
+      <input type="button" id="do_retrieve_password" value="Отправить инструкции по сбросу пароля" class="btn btn-primary" />
     </div>
   </fieldset>
 </form>
@@ -86,7 +87,9 @@
   <fieldset>
   <h3>Спасибо за регистрацию</h3>
   <br />
-  <div>На Ваш Email было выслано письмо с подробными инструкциями для активации аккаунта.</div>
+  <div>На Ваш Email было выслано письмо с подробными инструкциями для активации аккаунта.
+  <br /> <br /> Либо пройдите по ссылке: <span id="link_to_activate"></span>
+  </div>
   </fieldset>
 </form>
 </script>
