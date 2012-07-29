@@ -3,6 +3,7 @@
 class MainController < ApplicationController
   layout 'main'
 
+
   def check_session
     if session[:current_user] == nil
         redirect_to(:controller=>'enter',:action =>'index') and return false
@@ -24,7 +25,7 @@ class MainController < ApplicationController
 
   def search
 
-    #if check_session()
+    if check_session()
       if params[:type]
 
 
@@ -64,16 +65,51 @@ class MainController < ApplicationController
           render :json => {:success => false, :text => "There are no parameters"} and return  
       end
 
-
-
-    #end
+    end
 
   end
 
+  def save_template
+      if check_session()
+          if params[:title]
+            history=History.new(:title => params[:title], :json => params[:json], :user_id => session[:current_user].id)
+                if history.save
+                  render :json => {:success => true, :text => "ok"} and return
+                else
+                  render :json => {:success => false, :text => "error"} and return
+                end
+          end
+      end
+  end
+
+  def del_template
+      if check_session()
+          if params[:history_id]
+                history = History.find_by_id(params[:history_id].to_i)
+                if history
+                    if history.destroy
+                        render :text => "successfully removed" and return
+                    else
+                        render :text => "SQL error" and return
+                    end
+                else
+                    render :text => "No row to remove"  and return
+                end 
+          end
+      end  
+  end
+
+
   def view_history
+
     if check_session()
-      history=History.select('id, title, json,created_at').where(:user_id => session[:current_user]).limit(100).order("created_at")
-      render :json => history
+      if params[:history_id]
+        history=History.select('json').where(:id => params[:history_id].to_i)
+        render :json => history.fetch(0)
+      else
+        history=History.select('id, title, created_at').where(:user_id => session[:current_user]).limit(100).order("created_at DESC")
+        render :json => history
+      end
     end
   end
 

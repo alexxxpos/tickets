@@ -1,35 +1,18 @@
 //$(document).ready(function() {
 	$(function () {
-		//Block models
-    
-
-       /*Function.prototype.process= function( state ){
-          var process= function( ){
-              var args= arguments;
-              var self= arguments.callee;
-              setTimeout( function( ){
-                  self.handler.apply( self, args );
-              }, 0 )
-          }
-          for( var i in state ) process[ i ]= state[ i ];
-          process.handler= this;
-          return process;
-      }
-    */
-
-    var arrType=new Array();
+var arrType=new Array();
     arrType[1]="Л";
     arrType[3]="К";
     arrType[4]="П";
     arrType[14]="С2";
-    
 
+      
 
+     
     _.templateSettings = {interpolate : /\{\{(.+?)\}\}/g};
     
     var Facade = Backbone.Model.extend({
         path: "main/search?type=",
-        //path: "http://mock.my/proxy.php?type=",
         defaults:{
             allTasks:0,
             doneTasks:0
@@ -61,14 +44,16 @@
             $.ajax({
                 url: this.path+type+"/",
                 type: "post",
+                 beforeSend: function ( xhr ) {
+                    xhr.setRequestHeader("X-CSRF-Token", $('meta[name=csrf-token]').attr('content'));
+                },
                 data: data,
 
 
                 success: function( data ) {
-
-                    if(typeof(data) != "string"){
-                    senderIN.answerFacade(data, receiverIN);
-                }
+                    if (typeof(data.value)!="string"){
+                        senderIN.answerFacade(data, receiverIN);
+                    }
                     tasksIN.doneTask();   
                 },
                 error:function(){
@@ -78,8 +63,6 @@
             });
         }
     });
-
-                    
     
   
     
@@ -148,7 +131,8 @@
         events:{
             "click .toggle" : "toggle"
         },
-         initialize: function () { 
+         initialize: function () {
+            this.stateNext=true; 
             this.on('next', this.next, this);
         },
 
@@ -157,7 +141,6 @@
             $(this.el).find("button").button();
             $(this.el).find(".accordion").hide();
             
-            if (this.model.get("goodPlaces")>0){this.next();}
             return this;
         },
         next: function(){
@@ -182,6 +165,11 @@
             }
         },
         toggle:function(){
+            if (this.model.get("goodPlaces")>0 && this.stateNext){
+                this.stateNext=false;
+                this.next();
+            }
+
             $(this.el).find(".accordion").toggle();
         }
         
@@ -203,17 +191,54 @@
         },
         addOne: function(one) {
             if ( one.get("goodPlaces")>0 ) {
-                var oneView = new CoachResultView({
-                    model: one,
-                    collection: travelResult.get("tablePlaces")
-                });
-                $(this.el).tabs( "add", "#tab-" + one.get("tid"), one.get("num")+" "+arrType[one.get("coach_type_id")] );
+                switch(one.get("coach_type_id")){
+                    case "1":
+                        var oneView = new LResultView({
+                            model: one,
+                            collection: travelResult.get("tablePlaces")
+                        });
+
+
+                    break;
+                    case "3":
+                        var oneView = new KResultView({
+                            model: one,
+                            collection: travelResult.get("tablePlaces")
+                        });
+
+
+                    break;
+                    case "4":
+                        var oneView = new PResultView({
+                            model: one,
+                            collection: travelResult.get("tablePlaces")
+                        });
+
+                    break;
+                    default:
+                        var oneView = new CoachResultView({
+                        model: one,
+                        collection: travelResult.get("tablePlaces")
+                    });
+
+
+                }
+
+                $(this.el).tabs( 
+                    "add", 
+                    "#tab-" + one.get("tid"), 
+                    "Вагон "+one.get("num")+arrType[one.get("coach_type_id")]+" "+one.get("goodPlaces")+"мест" 
+                );
                 
                 $(this.el).find("#tab-"+one.get("tid")).append(oneView.render().el);
             }
         },
         header: function(){
-            return $("<h3>").html(this.template(this.model.toJSON()));
+            var obj=this.model.toJSON();
+            obj.date_from=this.model.showTime("from");
+            obj.date_till=this.model.showTime("till");
+
+            return $("<h3>").html(this.template(obj));
 
         }
         
@@ -226,24 +251,49 @@
             return this;
         },
         addOne: function(one){
-            $(this.el).append($("<button>").button({ label: one.get("place") + (one.get("goodPlace")?"*": "")}));
+            $(this.el).append($("<button>").button({
+                label: one.get("place") + (one.get("goodPlace")?"*": "")
+            }));
 
 
 
         }
     })
 
+    var OneCoachView=Backbone.View.extend({
+        render: function(){
+            $(this.el).html(this.template());
+            _.each(this.collection.where({tidCoach: this.model.get("tid")}),this.addOne,this);
+            return this;
+        },
+        addOne: function(one){
+            $(this.el).find("#p"+one.get("place")).html($("<button>").button({
+                label: one.get("place") + (one.get("goodPlace")?"*": "")
+            }));
 
-    
 
-    
-    
-    
-    
-    
-    //End TravelResultView    
-    
-    
+
+        }
+    });
+
+    var KResultView =OneCoachView.extend({
+        template: _.template($('#KView').html()),
+        
+    });
+
+    var PResultView =OneCoachView.extend({
+        template: _.template($('#PView').html()),
+        
+    });
+
+    var LResultView =OneCoachView.extend({
+        template: _.template($('#LView').html()),
+        
+    });
+
+
+    //End TravelResultView  
+     
     //Block models
     var Parametrs= Backbone.Model.extend({
        defaults: {
@@ -260,7 +310,17 @@
            till: "23:59"
 
            
-       } 
+       },
+       getTime:function(type){
+            var time;
+            time=this.get(type);
+            time=time.split(":");
+            time=parseInt(time[0])*60+parseInt(time[1]);
+            return time;
+            
+
+            }
+
     });
     
     var Station= Backbone.Model.extend({ 
@@ -358,22 +418,87 @@
     //Block AppViews
     var AppView=Backbone.View.extend({
         initialize: function (options) {
-            var testString='[{"parametrs":{"number":"2","l":false,"k":true,"p":false,"s1":false,"s2":false,"down":true,"one":true,"side":false,"from":"15:00","till":"23:59"},"stationsFrom":[{"title":"Днепропетровск Главный","station_id":2210700}],"stationsTo":[{"title":"Евпатория-Курорт","station_id":2210770},{"title":"Симферополь","station_id":2210001}],"dates":[{"date":"24.08.2012"}]},{"parametrs":{"number":"2","l":false,"k":true,"p":false,"s1":false,"s2":false,"down":true,"one":true,"side":false,"from":"15:00","till":"23:59"},"stationsFrom":[{"title":"Евпатория-Курорт","station_id":2210770},{"title":"Симферополь","station_id":2210001}],"stationsTo":[{"title":"Днепропетровск Главный","station_id":2210700}],"dates":[{"date":"31.08.2012"}]}]';
+            //var testString='[{"parametrs":{"number":"2","l":false,"k":true,"p":false,"s1":false,"s2":false,"down":true,"one":true,"side":false,"from":"15:00","till":"23:59"},"stationsFrom":[{"title":"Днепропетровск Главный","station_id":2210700}],"stationsTo":[{"title":"Евпатория-Курорт","station_id":2210770},{"title":"Симферополь","station_id":2210001}],"dates":[{"date":"24.08.2012"}]},{"parametrs":{"number":"2","l":false,"k":true,"p":false,"s1":false,"s2":false,"down":true,"one":true,"side":false,"from":"15:00","till":"23:59"},"stationsFrom":[{"title":"Евпатория-Курорт","station_id":2210770},{"title":"Симферополь","station_id":2210001}],"stationsTo":[{"title":"Днепропетровск Главный","station_id":2210700}],"dates":[{"date":"31.08.2012"}]}]';
             
-            
+            changer.on("change", this.up, this);
             this.render();
             
             travel= new Travel();
-            var travelView = new TravelView({collection: travel, el :$(this.el).children($(".TravelView"))});
+            this.travelView = new TravelView({collection: travel, el :$(this.el).children($(".TravelView"))});
             
+                // Дикий хай. Начало. Модуль сохранения шаблона
+                $('#save_template_button span').click(function(event) {
+                    var save_search_dialog = $('#save_search_dialog').html();
+                    $('<div id="dialog">'+save_search_dialog+'</div>').appendTo('body');            
+                        event.preventDefault();
+
+                                $("#dialog").dialog({ 
+                                        title: "Укажите название шаблона",                                  
+                                        width: 250,
+                                        height: 150,
+                                        draggable: true,
+                                        position: "center",
+                                        buttons: {
+                                  "Сохранить": function() {
+                                    var title=$("#dialog input").val();
+                                    if (title.length!=0){
+
+                                        $.ajax({
+                                                type: "POST",
+                                                url: 'main/save_template',
+                                                beforeSend: function ( xhr ) {
+                                                    xhr.setRequestHeader("X-CSRF-Token", $('meta[name=csrf-token]').attr('content'));
+                                                },
+                                                data:{title:title, json:JSON.stringify(travel)},
+                                                success: function(data){
+                                                    if(data.success==true){
+                                                        $(this).dialog("close");
+                                                        $('#dialog').remove();
+                                                        controller.navigate("!/history", true);
+                                                    }else{
+                                                        $(this).dialog("close");
+                                                        $('#dialog').remove();
+                                                        alert("Возникла ошибка записи шаблона");
+                                                    }
+                                                    //controller.navigate("!/search", true);
+                                                    //alert(data.json);
+                                                    //appView=new AppView({el: $("#search_box")});
+                                                    //changer.set({type:"from", jsonstring:data.json});
+                                                }
+                                    
+                                        });
+
+                                        $(this).dialog("close");
+
+                                        
+                                    }
+                                    
+                                  },
+                                  "Закрыть": function() {
+                                    $(this).dialog("close");
+                                    $('#dialog').remove();
+                                  }
+                                }
+                                });
+                    });  
+                //Дикий хай. Конец
+
+
+            //travel.constructFrom(JSON.parse(testString));
             
-            travel.constructFrom(JSON.parse(testString));
-            
+        },
+        up:function(){
+            if (changer.get("type")=="from"){
+                var jsonstring=changer.get("jsonstring");
+                travel.constructFrom(JSON.parse(jsonstring));
+                changer.set({type:"none"});
+            }
+
         },
         events: {
            
             "click .search" : "search",
-            "click .console" : "consoleShow"
+            "click .research" : "showResult",
         },
         
         template: _.template($('#AppView').html()),
@@ -383,7 +508,7 @@
 
             travelResult=new TravelResult();
             travelResult.downloadPlaces(travel);
-
+            $("#save_template_button").show("slow");
             
         },
         consoleShow: function(){
@@ -400,11 +525,14 @@
             
         },
         showResult:function(){
-            
+            this.travelView.hide();
+            travelResult.falseGoodPlaces();
+            travelResult.searchGoodPlaces();
             travelResult.countGoodPlaces();
             var travelResultView = new TravelResultView({model: travelResult, el:$(this.el).find($(".Result"))});
             
         }
+
         
         
         
@@ -422,11 +550,12 @@
             //this.model.set("number", $(this.el).find(".number").val());
             var param=e.currentTarget.id;
             var value=e.currentTarget.value;
-            if (value=="on"){value=true;}
-            if (value=="off"){value=false;}
+            if (e.currentTarget.checked){value=true;}
+            if (!e.currentTarget.checked && e.currentTarget.value=="on"){value=false;}
             var obj={};
             obj[param]=value;
             this.model.set(obj);
+            
         },
         render: function(){
             $(this.el).html(this.template(this.model.toJSON()));
@@ -595,6 +724,7 @@
         initialize: function(){
             this.model.on('destroy', this.remove, this);
             this.model.on('change', this.render, this);
+            this.model.on('toggle', this.toggle, this);
             this.model.trigger("change");
             //this.render();
 
@@ -620,6 +750,10 @@
         
         
         },
+        toggle:function(){
+            $(this.el).find(".toggleIN").toggle();
+
+        },
         deleteOne: function() {
             this.model.destroy();
             return false;
@@ -634,7 +768,9 @@
     var TravelView = EnumsView.extend({
         template: _.template($('#TravelView').html()),
         events: {
-            "click .addTrip" : "createOne"
+            "click .addTrip" : "createOne",
+            "click .toggleTrip": "toggle"
+            
         },
         initialize: function() {
 
@@ -644,6 +780,23 @@
             
 
         },
+        toggle:function(){
+            this.collection.each(function(one){
+                one.trigger("toggle");
+
+            },this);
+            $(this.el).children(".addTrip" ).toggle();
+            var label = $(this.el).children(".toggleTrip" ).button( "option", "label" );
+            label=="Свернуть"?label="Развернуть":label="Свернуть";
+            $(this.el).find(".toggleTrip").button( "option", "label", label );
+
+        },
+        hide:function(){
+            var label = $(this.el).children(".toggleTrip" ).button( "option", "label" );
+            if(label=="Свернуть"){this.toggle();}
+
+        },
+
         createOne: function() {
             var newParametrs = new Parametrs();
             var newStationsFrom = new Stations();
@@ -740,7 +893,7 @@
            },this);
        },
        getTrainByTid: function (tidTrain){
-           return this.get("tableTrains").where({tid:tidTrain})[0];
+           return this.get("tableTrains").models[tidTrain];
        },
        countGoodPlaces: function(){
            var arr=this.get("tablePlaces").countGoodPlaces();
@@ -748,6 +901,18 @@
            arr=this.get("tableTrains").countGoodPlaces(arr);
            this.get("tableSimpleTrips").countGoodPlaces(arr);
            
+       },
+       searchGoodPlaces: function(){
+            var goodTrains=this.get("tableTrains").searchGoodPlaces();
+            var goodCoaches=this.get("tableCoaches").searchGoodPlaces(goodTrains);
+            var goodPlaces=this.get("tablePlaces").searchGoodPlaces(goodCoaches);
+
+       },
+       falseGoodPlaces:function(){
+            this.get("tablePlaces").each(function(one){
+                one.set({goodPlace:false});
+
+            },this);
        }
        
        
@@ -879,6 +1044,31 @@
            station_till:"",
            date_till: 0,
            goodPlaces:0
+       },
+       showTime:function(type){
+            var ret=this.getTime(type);
+            var minute=ret%60;
+            var hour=(ret-minute)/60;
+            ret=hour+":"+minute;
+            return ret;
+
+       },
+       getTime:function(type){
+            var ret;
+            switch(type){
+                case "from":
+                    ret=this.get("date_from");
+                break;
+                case "till":
+                    ret=this.get("date_till");
+                break;
+                default:
+                    ret=this.get("date_from");
+
+            }
+            ret=((ret % (24*3600))+(3*3600))/60;
+            return ret;
+
        }
    });
    
@@ -905,6 +1095,33 @@
            },this);
            return newArr;
            
+       },
+       getArrTrips:function(){
+            var ArrTrips=new Array();
+            travelResult.get("tableSimpleTrips").each(function(one){
+                ArrTrips[one.get("tid")]=one.get("tidTrip");
+
+            },this);
+            return ArrTrips;
+
+       },
+
+       searchGoodPlaces:function(){
+            var arrTrips=this.getArrTrips();
+            var arrGoodTrains=new Array();
+            //Проверка времени отправления
+            this.each(function(one){
+                var paramsId=arrTrips[one.get("tidSimpleTrip")];
+                var params=travel.models[paramsId].get("parametrs");
+                
+                if (one.getTime("from") >= params.getTime("from") && one.getTime("from") <= params.getTime("till")){
+                    arrGoodTrains[one.get("tid")]=paramsId;
+
+                }  
+
+            },this);
+            return arrGoodTrains;
+
        }
    });
    
@@ -1033,9 +1250,36 @@
                one.set({"goodPlaces": arr[one.get("tid")]});
                newArr[one.get("tidTrain")]==undefined ? newArr[one.get("tidTrain")]=one.get("goodPlaces") : newArr[one.get("tidTrain")]+=one.get("goodPlaces");
                     
+               
+               
            },this);
            return newArr;
+           
+       },
+       searchGoodPlaces:function(goodTrains){
+        //поиск по типу вагона
+            var goodCoaches=new Array();
+            this.each(function(one){
+                if ( goodTrains[one.get("tidTrain")] != undefined){
+                    var paramsId=goodTrains[one.get("tidTrain")];
+                    var params=travel.models[paramsId].get("parametrs");
+                    if (params.get("l") && one.get("coach_type_id")==1){goodCoaches[one.get("tid")]=paramsId;}
+                    if (params.get("k") && one.get("coach_type_id")==3){goodCoaches[one.get("tid")]=paramsId;}
+                    if (params.get("p") && one.get("coach_type_id")==4){goodCoaches[one.get("tid")]=paramsId;}
+                    if (params.get("s2") && one.get("coach_type_id")==14){goodCoaches[one.get("tid")]=paramsId;}
+                    
+                }
+
+
+            },this);
+            return goodCoaches;
+
        }
+
+       
+       
+       
+       
        
    });
    
@@ -1046,7 +1290,7 @@
            tidCoach:0,
            place:0,
            order:false,
-           goodPlace:true
+           goodPlace:false
        }
    })
    var TablePlaces = Backbone.Collection.extend({
@@ -1070,11 +1314,293 @@
            },this);
 
            return newArr;
+       },
+       checkL: function(params, one, arrPlaces, arr){
+            if ( !(params.get("one") && params.get("number") >2) ) {
+                if (!params.get("one") ){
+                    if(arrPlaces.length>=params.get("number")){
+                        _.each(arrPlaces, function(one){
+                            one.set({goodPlace:true});
+                        },this);
+                    }
+                }
+
+                if ( params.get("one") ){
+                        
+                    for (var i=1; i<20; i=i+2){
+                        var all=(arr[i]?1:0)+(arr[i+1]?1:0);
+                        
+                        if (all >=params.get("number") ){
+                            _.each(arrPlaces, function(one){
+                                if(one.get("place")==i || one.get("place")==i+1){
+                                    one.set({goodPlace:true});
+                                }
+                            },this);
+
+                        }                         
+
+
+                    }
+
+                }
+
+
+
+
+            }
+
+       },
+       checkK:function(params, one, arrPlaces, arr){
+                if ( !(params.get("one") && params.get("number") >4) ) {
+                    
+                
+                    
+                    if (!params.get("one") && params.get("down")){
+                        var coutPlaces=0;
+                        _.each(arrPlaces, function(one){
+                            if(one.get("place")%2==1){coutPlaces++;}
+
+                        },this)
+                        
+                        if (coutPlaces >=params.get("number")){
+                            _.each(arrPlaces, function(one){
+                                if(one.get("place")%2==1){
+                                    one.set({goodPlace:true});
+                                }
+                            },this)
+
+                        }
+
+                    }
+
+                    if (!params.get("one") && !params.get("down") ){
+                        if(arrPlaces.length>=params.get("number")){
+                            _.each(arrPlaces, function(one){
+                                one.set({goodPlace:true});
+                            },this);
+                        }
+                    }
+
+                    if ( params.get("one") && params.get("down") ){
+                        
+                        for (var i=1; i<40; i=i+4){
+                            var down=(arr[i]?1:0)+(arr[i+2]?1:0);
+                            var up=(arr[i+1]?1:0)+(arr[i+3]?1:0);
+
+                            if (params.get("number")==1 && down>=1){
+                                _.each(arrPlaces, function(one){
+                                    if(one.get("place")==i || one.get("place")==i+2){
+                                        one.set({goodPlace:true});
+                                    }
+                                },this);
+
+                            }
+                            if (params.get("number")==2 && down==2){
+                                _.each(arrPlaces, function(one){
+                                    if(one.get("place")==i || one.get("place")==i+2){
+                                        one.set({goodPlace:true});
+                                    }
+                                },this);
+
+                            }
+                            if (params.get("number")==3 && down==2 && up>=1){
+                                _.each(arrPlaces, function(one){
+                                    if(one.get("place")==i || one.get("place")==i+2 || one.get("place")==i+1 || one.get("place")==i+3){
+                                        one.set({goodPlace:true});
+                                    }
+                                },this);
+
+                            }
+                            if (params.get("number")==4 && down==2 && up==2){
+                                _.each(arrPlaces, function(one){
+                                    if(one.get("place")==i || one.get("place")==i+2 || one.get("place")==i+1 || one.get("place")==i+3){
+                                        one.set({goodPlace:true});
+                                    }
+                                },this);
+
+                            }                         
+
+
+                        }
+
+
+                    }
+
+                    if ( params.get("one") && !params.get("down") ){
+                        
+                        for (var i=1; i<40; i=i+4){
+                            var all=(arr[i]?1:0)+(arr[i+2]?1:0)+(arr[i+1]?1:0)+(arr[i+3]?1:0);
+                            
+                            if (all >=params.get("number") ){
+                                _.each(arrPlaces, function(one){
+                                    if(one.get("place")==i || one.get("place")==i+2 || one.get("place")==i+1 || one.get("place")==i+3){
+                                        one.set({goodPlace:true});
+                                    }
+                                },this);
+
+                            }                         
+
+
+                        }
+
+                    }
+
+
+                }
+
+       },
+       checkP:function(params, one, arrPlaces, arr){
+            if (params.get("side")){
+                arrPlaces = _.filter(arrPlaces, function(one){ return one.get("place") <=36; },this);
+                arr=new Array();
+                _.each(arrPlaces, function(one){
+                    arr[one.get("place")]=true;
+
+                },this)
+                this.checkK(params, one, arrPlaces, arr);
+            } else {
+                if ( params.get("one") && !params.get("down") ){
+                    for (var i=1; i<36; i=i+4){
+                        var all=(arr[i]?1:0)+(arr[i+2]?1:0)+(arr[i+1]?1:0)+(arr[i+3]?1:0)+(arr[54-Math.floor(i/4)*2-1]?1:0)+(arr[54-Math.floor(i/4)*2]?1:0);                     
+                        if (all >=params.get("number") ){
+                            _.each(arrPlaces, function(one){
+                                if(one.get("place")==i || one.get("place")==i+2 || one.get("place")==i+1 || one.get("place")==i+3 || one.get("place")==54-Math.floor(i/4)*2-1|| one.get("place")==54-Math.floor(i/4)*2){
+                                    one.set({goodPlace:true});
+                                }
+                            },this);
+                        }                         
+                    }
+                }
+                if (!params.get("one") && !params.get("down") ){
+                    if(arrPlaces.length>=params.get("number")){
+                        _.each(arrPlaces, function(one){
+                            one.set({goodPlace:true});
+                        },this);
+                    }
+                }
+
+                if (!params.get("one") && params.get("down")){
+                    var coutPlaces=0;
+                    _.each(arrPlaces, function(one){
+                        if(one.get("place")%2==1){coutPlaces++;}
+
+                    },this)
+                    
+                    if (coutPlaces >=params.get("number")){
+                        _.each(arrPlaces, function(one){
+                            if(one.get("place")%2==1){
+                                one.set({goodPlace:true});
+                            }
+                        },this)
+
+                    }
+
+                }
+
+                if ( params.get("one") && params.get("down") ){
+                        
+                    for (var i=1; i<40; i=i+4){
+                        var down=(arr[i]?1:0)+(arr[i+2]?1:0)+(arr[54-Math.floor(i/4)*2-1]?1:0);
+                        var up=(arr[i+1]?1:0)+(arr[i+3]?1:0)+(arr[54-Math.floor(i/4)*2]?1:0);
+
+                        if ( (params.get("number")==1 && down>=1) || (params.get("number")==2 && down>=2) || (params.get("number")==3 && down>=3)){
+                            _.each(arrPlaces, function(one){
+                                if(one.get("place")==i || one.get("place")==i+2 || one.get("place")==54-Math.floor(i/4)*2-1){
+                                    one.set({goodPlace:true});
+                                }
+                            },this);
+
+                        }
+                        
+                        if ( (params.get("number")==4 && down==3 && up>=1) || (params.get("number")==5 && down==3 && up>=2) || (params.get("number")==6 && down==3 && up==3)){
+                            _.each(arrPlaces, function(one){
+                                if( one.get("place")==i || one.get("place")==i+2 || one.get("place")==i+1 || one.get("place")==i+3 || one.get("place")==54-Math.floor(i/4)*2-1 || one.get("place")==54-Math.floor(i/4)*2 ) {
+                                    one.set({goodPlace:true});
+                                }
+                            },this);
+
+                        }
+                        
+
+
+
+                    }
+
+
+                }
+
+
+
+
+
+
+
+            }
+
+       },
+       searchGoodPlaces:function(goodCoaches){
+           /* */
+            for (var index in goodCoaches){
+                var tidCoach=parseInt(index)
+                var arrPlaces=this.where({tidCoach:tidCoach});
+                
+                var arr=new Array();
+                _.each(arrPlaces, function(one){
+                    arr[one.get("place")]=true;
+
+                },this)
+
+                var paramsId=goodCoaches[index];
+                var params=travel.models[paramsId].get("parametrs");
+
+                var coach_type_id=travelResult.get("tableCoaches").models[tidCoach].get("coach_type_id");
+                
+                switch (coach_type_id){
+                    case "1":
+                        this.checkL(params, one, arrPlaces, arr);
+                    break;
+                    case "3":
+                        this.checkK(params, one, arrPlaces, arr);
+                    break;
+                    case "4":
+                         this.checkP(params, one, arrPlaces, arr);
+                    break;
+
+                    default:
+                        this.each(function(one){
+                            if ( goodCoaches[one.get("tidCoach")] != undefined){
+                                one.set({goodPlace:true});
+                            }
+                        },this);
+                }
+
+                
+            }
+
+
        }
    });
+   
+   
+   
+        
+        
+  //End Relation Logic      
+    //End block SearchResult
+
+    var Changer= Backbone.Model.extend({
+            defaults:{
+                jsonstring:"",
+                type:"none"
+
+            }
+        });
+
+        var changer=new Changer();
 
 
-		//end index/js
+    //end changer
+    //paste here
 
 		var AppState = Backbone.Model.extend({
 	        defaults: {
@@ -1134,25 +1660,61 @@
                         xhr.setRequestHeader("X-CSRF-Token", $('meta[name=csrf-token]').attr('content'));
                     },
                     success: function(data){
+                        if(data.length<1) { 
+                            var str="<div id='no_history_found'><h3>У Вас нет текущих шаблонов</h3><p>Используя пунк меню <strong>'Поиск'</strong>, Вы можете сохранять важные маршруты. Для этого Вам необходимо <br />выбрать пункт - <strong>Добавить поездку</strong>, указать станцию прибытия, станцию отправления и желаемую дату.</p><p>Зайдействовать нужный шаблон поиска можно на этой вкладке.</p><br /><br /><br /><p class='signup_adm'>C уважением, администрация сайта<p></div>";
 
+                            $("#history_box").html(str);
+                            return;
+                        } 
                         var history_content="<table cellspacing='4'>";
 
                         $.each(data, function(index, value) {
-                            history_content+="<tr><td>"+(index+1)+".</td><td>"+value.title+"</td><td>"+value.created_at+"</td><td><button id='history_template_"+value.id+"' class='add ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only' role='button' aria-disabled='false'><span class='ui-button-text'>Применить</span></button></td></tr>";
+                            my_date=(value.created_at).substring(0,10) + " / "+(value.created_at).substring(11,19);
+                            history_content+="<tr><td>"+(index+1)+".</td><td>"+value.title+"</td><td>"+my_date+"</td><td><button button_do='use' id='history_template_"+value.id+"' class='add ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only' role='button' history_id='"+value.id+"'aria-disabled='false'><span class='ui-button-text'>Применить</span></button><button  button_do='del' class='add ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only' role='button' history_id='"+value.id+"'aria-disabled='false'><span class='ui-button-text'>X</span></td></tr>";
                         });
 
                         history_content+="</table>";
                         $("#history_box").html(history_content);
 
                         $('#history_box button').bind('click', function() {
-                            //какие-то действия
+
+                            if ($(this).attr('button_do')=="use"){
+                                $.ajax({
+                                    type: "POST",
+                                    url: 'main/view_history',
+                                    beforeSend: function ( xhr ) {
+                                        xhr.setRequestHeader("X-CSRF-Token", $('meta[name=csrf-token]').attr('content'));
+                                    },
+                                    data:{history_id:$(this).attr('history_id')},
+                                    success: function(data){
+                                        controller.navigate("!/search", true);
+                                        //alert(data.json);
+                                        appView=new AppView({el: $("#search_box")});
+                                        changer.set({type:"from", jsonstring:data.json});
+                                        
+                                    }
+                        
+                                 });
+                            }else{
+                                $.ajax({
+                                    type: "POST",
+                                    url: 'main/del_template',
+                                    beforeSend: function ( xhr ) {
+                                        xhr.setRequestHeader("X-CSRF-Token", $('meta[name=csrf-token]').attr('content'));
+                                    },
+                                    data:{history_id:$(this).attr('history_id')},
+                                    success: function(data){
+                                        controller.navigate("!/test", true);
+                                        controller.navigate("!/history", true);
+                                    }
+                        
+                                 });
+                            }
                         });
-
                     }
-                });
 
-             } 
-	        
+                }); 
+	        }
     	});
                     var travel;
                     var travelResult;
@@ -1163,65 +1725,10 @@
 
 
 
-    	/*var Block = Backbone.View.extend({
-	        el: $("#main_block"), // DOM elememt of our widget
-
-	        /*templates: { // template on dif states
-	            "search": _.template($('#search_block').html()),
-	            "templates": _.template($('#template_block').html()),
-	            "orders": _.template($('#order_block').html()),
-	            "history": _.template($('#history_block').html())
-	        }, */
-
-	        /*events: {
-	            //"click #do_registration": "registration", // handler on click button to registrate 
-	            //"click #do_login": "login",               // handler on click button to login
-            }, */
-
-
-	/*        initialize: function () { // Subscribe to the model events
-	            this.model.bind('change', this.render, this);
-	        },
-
-	        render: function () {
-	            var state = this.model.get("state");
-	            $(this.el).html(this.templates[state](this.model.toJSON()));
-                if (state == "search"){
-                    $(this.el).find("#app").append(appView.el);
-
-                }
-	            return this;
-        	}
-    	}); */
-                        
-
-    	//var block = new Block({ model: appState }); // create container for our templates
-
-    	//appState.trigger("change"); // Call event 'change' in our model
-
-    	/*appState.bind("change:state", function () { // event on change state in controller
-	        var state = this.get("state");
-	        $('#search_panel').find('li.tab').removeClass("active"); // drop styles in tabs
-	        $('#'+state).addClass("active");    // use "active" in current tab
-
-	        if (state == "search"){
-                
-	            controller.navigate("!/", false); // false because we don't need to call state event
-	                                              // in controller
-
-                    //Init application
-                    //var travel= new Travel();
-                    //var travelView = new TravelView({ collection: travel, el :$("#app") });
-                    
-	        }else
-	            controller.navigate("!/" + state, true);
-
-    	});*/
-
-
-
-    	Backbone.history.start();  // Start HTML5 History push  
+    Backbone.history.start();  // Start HTML5 History push  
                                
+
+//JSON.stringify(travel)
 
 
 }); 

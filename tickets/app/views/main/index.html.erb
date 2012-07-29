@@ -14,6 +14,12 @@
 	</div>
 
 
+<div  id="save_search_dialog" style="display:none">
+    <input type="text" maxlength="30"/>
+</div>
+
+
+
 	<div id="search_panel">
 		<ul>
 			<li id="search" class="tab active">
@@ -62,9 +68,11 @@
 	<h3>шаблон истории</h3>
 </script>
 
+
+
 <!-- Test templates !-->
 
-        <script type="text/template" id="StationView">
+  <script type="text/template" id="StationView">
                 <input class="input" type="text" value="{{title}}" />
                 <button class="del">X</button>
         </script>
@@ -77,28 +85,32 @@
                 <span></span>
         </script>
         <script type="text/template" id="DatesView">
-                <button class="add">Добавить дату</button>
+                <button class="add">&nbsp;&nbsp;&nbsp;&nbsp;Добавить дату&nbsp;&nbsp;&nbsp;</button>
                 <span></span>
         </script>
         <script type="text/template" id="TripView">
                 <div class="parametrsView"></div>
-                <div class="stationsFromView"></div>
-                <div class="stationsToView"></div>
-                <div class="datesView"></div>
-                <button class="del">Удалить поездку</button>
+                <div class="stationsFromView toggleIN"></div>
+                <div class="stationsToView toggleIN"></div>
+                <div class="datesView toggleIN"></div>
+                <button class="del toggleIN" >&nbsp;&nbsp;Удалить поездку&nbsp;</button><br />
+                
                 <hr>
+
         </script>
         <script type="text/template" id="TravelView">
                 <div class="Travel"></div>
                 <button class="addTrip">Добавить поездку</button>
+                <button class="toggleTrip">Свернуть</button>
                 
         </script>
         <script type="text/template" id="AppView">
                 <div class="TravelView"></div>
-                <button class="search">Поиск мест</button>
-                <button class="console">Консоль</button>
+                <button class="search">Загрузка мест</button>
+                <button class="research">Перепроверить места</button><button id="save_template_button" style="display:none;">Сохранить путешествие</button>
                 <hr>
-                <div class="Result"></div>
+                <div class="Result"></div><br />
+                
         </script>
         <script type="text/template" id="Progress">
                 <div class="progressBar"></div>
@@ -134,5 +146,49 @@
                 <div class="accordion"></div>
         </script>
         <script type="text/template" id="TrainHeader">
-                <a href="#">{{num}}</a>
+                <a href="#">
+                        <p>Поезд №{{num}} {{station_from}}-{{station_till}} Отправление:{{date_from}} Прибытие:{{date_till}}</p>
+                        <p>В наличии {{goodPlaces}} подходящих мест</p>
+                </a>
         </script>
+
+        <script type="text/template" id="KView">
+                <table >
+                        <tr>
+                                <td id="p2"></td><td>&nbsp</td><td id="p4"></td><td id="p6"></td><td>&nbsp</td><td id="p8"></td><td id="p10"></td><td>&nbsp</td><td id="p12"></td><td id="p14"></td><td>&nbsp</td><td id="p16"></td><td id="p18"></td><td>&nbsp</td><td id="p20"></td><td id="p22"></td><td>&nbsp</td><td id="p24"></td><td id="p26"></td><td>&nbsp</td><td id="p28"></td><td id="p30"></td><td>&nbsp</td><td id="p32"></td><td id="p34"></td><td>&nbsp</td><td id="p36"></td><td id="p38"></td><td>&nbsp</td><td id="p40"></td>
+                        </tr>
+                        <tr>
+                                <td id="p1"></td><td>&nbsp</td><td id="p3"></td><td id="p5"></td><td>&nbsp</td><td id="p7"></td><td id="p9"></td><td>&nbsp</td><td id="p11"></td><td id="p13"></td><td>&nbsp</td><td id="p15"></td><td id="p17"></td><td>&nbsp</td><td id="p19"></td><td id="p21"></td><td>&nbsp</td><td id="p23"></td><td id="p25"></td><td>&nbsp</td><td id="p27"></td><td id="p29"></td><td>&nbsp</td><td id="p31"></td><td id="p33"></td><td>&nbsp</td><td id="p35"></td><td id="p37"></td><td>&nbsp</td><td id="p39"></td>
+                        </tr>
+
+
+
+                </table>
+        </script>
+        <script type="text/template" id="PView">
+                <table>
+                        <tr>
+                                <td id="p2"></td><td>&nbsp</td><td id="p4"></td><td id="p6"></td><td>&nbsp</td><td id="p8"></td><td id="p10"></td><td>&nbsp</td><td id="p12"></td><td id="p14"></td><td>&nbsp</td><td id="p16"></td><td id="p18"></td><td>&nbsp</td><td id="p20"></td><td id="p22"></td><td>&nbsp</td><td id="p24"></td><td id="p26"></td><td>&nbsp</td><td id="p28"></td><td id="p30"></td><td>&nbsp</td><td id="p32"></td><td id="p34"></td><td>&nbsp</td><td id="p36">
+                        </tr>
+                        <tr>
+                                <td id="p1"></td><td>&nbsp</td><td id="p3"></td><td id="p5"></td><td>&nbsp</td><td id="p7"></td><td id="p9"></td><td>&nbsp</td><td id="p11"></td><td id="p13"></td><td>&nbsp</td><td id="p15"></td><td id="p17"></td><td>&nbsp</td><td id="p19"></td><td id="p21"></td><td>&nbsp</td><td id="p23"></td><td id="p25"></td><td>&nbsp</td><td id="p27"></td><td id="p29"></td><td>&nbsp</td><td id="p31"></td><td id="p33"></td><td>&nbsp</td><td id="p35">
+                        </tr>
+                        <tr>
+                                <td colspan="3" id="p54"><td colspan="3" id="p52"><td colspan="3" id="p50"><td colspan="3" id="p48"><td colspan="3" id="p46"><td colspan="3" id="p44"><td colspan="3" id="p42"><td colspan="3" id="p40"><td colspan="3" id="p38">
+                        </tr>
+                        <tr>
+                                <td colspan="3" id="p53"><td colspan="3" id="p51"><td colspan="3" id="p49"><td colspan="3" id="p47"><td colspan="3" id="p45"><td colspan="3" id="p43"><td colspan="3" id="p41"><td colspan="3" id="p39"><td colspan="3" id="p37">
+                        </tr>
+
+
+
+                </table>
+        </script>
+        <script type="text/template" id="LView">
+                <table>
+                        <tr>
+                                <td id="p1"></td><td>&nbsp</td><td id="p2"></td><td id="p3"></td><td>&nbsp</td><td id="p4"></td><td id="p5"></td><td>&nbsp</td><td id="p6"></td><td id="p7"></td><td>&nbsp</td><td id="p8"></td><td id="p9"></td><td>&nbsp</td><td id="p10"></td><td id="p11"></td><td>&nbsp</td><td id="p12"></td><td id="p13"></td><td>&nbsp</td><td id="p14"></td><td id="p15"></td><td>&nbsp</td><td id="p16"></td><td id="p17"></td><td>&nbsp</td><td id="p18"><td id="p19"></td><td>&nbsp</td><td id="p20">
+                        </tr>
+                </table>
+        </script>
+      
